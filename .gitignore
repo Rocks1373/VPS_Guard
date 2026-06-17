@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Runtime data & logs (do not commit secrets / operational data)
+logs/*.log
+logs/*.log.*
+data/*.json
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/

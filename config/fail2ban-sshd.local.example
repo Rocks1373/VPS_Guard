@@ -1,0 +1,25 @@
+# Example fail2ban jail for SSH brute-force protection.
+# Copy to /etc/fail2ban/jail.local (or jail.d/sshd.local) and:
+#   sudo systemctl restart fail2ban
+#
+# The Security Dashboard auto-detects active jails via fail2ban-client.
+
+[DEFAULT]
+# Ban for 1 hour after 5 failures within 10 minutes
+bantime  = 1h
+findtime = 10m
+maxretry = 5
+# Use ufw or iptables as the ban action (match your firewall backend)
+banaction = ufw
+
+[sshd]
+enabled  = true
+port     = ssh
+logpath  = %(sshd_log)s
+backend  = systemd
+
+# Optional: protect a web app behind nginx from auth abuse
+# [nginx-http-auth]
+# enabled = true
+# port    = http,https
+# logpath = /var/log/nginx/error.log

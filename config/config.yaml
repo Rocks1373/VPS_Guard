@@ -1,0 +1,76 @@
+# ==========================================================================
+# Security Monitoring Dashboard - Configuration
+# ==========================================================================
+# All settings can be overridden by environment variables prefixed with SECDASH_
+# e.g. SECDASH_SERVER_PORT=8080
+# ==========================================================================
+
+server:
+  host: "0.0.0.0"
+  port: 5000
+  # IMPORTANT: change this secret in production (or set SECDASH_SERVER_SECRET_KEY)
+  secret_key: "change-this-secret-key-in-production"
+  debug: false
+
+auth:
+  # Dashboard login. Password is stored hashed in data/users.json after first run.
+  # Default credentials (CHANGE IMMEDIATELY): admin / changeme
+  enabled: true
+  username: "admin"
+  # Default password used to seed the user store on first launch.
+  default_password: "changeme"
+  session_timeout_minutes: 120
+
+monitoring:
+  # How often (seconds) background collectors refresh data
+  poll_interval: 5
+  # Connection states to track for the active-connections view
+  track_states: ["ESTABLISHED", "SYN_SENT", "SYN_RECV", "TIME_WAIT"]
+  # Per-IP connection count that triggers a suspicious-activity alert
+  connection_threshold: 100
+  # Ports considered sensitive; inbound connections trigger informational alerts
+  sensitive_ports: [22, 3306, 5432, 6379, 27017, 9200]
+
+ids:
+  # fail2ban integration
+  fail2ban_enabled: true
+  # Jails to surface in the dashboard (auto-detected if empty)
+  jails: []
+
+firewall:
+  # backend: "ufw" or "iptables"
+  backend: "ufw"
+  # Set true to actually apply block/unblock commands. When false the app runs
+  # in DRY-RUN mode and only logs what it *would* do (safe for testing).
+  enforce: false
+  # Chain used for manual IP blocks when backend is iptables
+  iptables_chain: "SECDASH_BLOCK"
+
+offensive:
+  # Master switch for the offensive/testing toolkit.
+  enabled: true
+  # Require an explicit authorization acknowledgement before any scan runs.
+  require_authorization: true
+  # Hard allow-list of CIDR ranges / hosts that may be scanned. Empty = no
+  # restriction (NOT recommended). Add your own assets / authorized targets.
+  target_allowlist: []
+  # Hosts that must NEVER be scanned even if present elsewhere.
+  target_denylist: ["169.254.169.254"]
+  nmap_path: "nmap"
+  # Safety cap on concurrent scans
+  max_concurrent_scans: 2
+
+alerts:
+  # Severity levels: info, low, medium, high, critical
+  retention_days: 30
+  # Optional webhook (Slack/Discord/generic) for high+ severity alerts
+  webhook_url: ""
+  webhook_min_severity: "high"
+
+logging:
+  level: "INFO"
+  app_log: "logs/app.log"
+  audit_log: "logs/audit.log"
+  alert_log: "logs/alerts.log"
+  max_bytes: 10485760   # 10 MB
+  backup_count: 5

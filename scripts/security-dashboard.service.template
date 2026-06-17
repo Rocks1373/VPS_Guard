@@ -1,0 +1,23 @@
+[Unit]
+Description=Security Monitoring Dashboard
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Running as root gives full firewall/IDS/connection visibility. To run less
+# privileged, change User= and grant CAP_NET_ADMIN / sudo rules as needed.
+User={{USER}}
+WorkingDirectory={{PROJECT_DIR}}
+Environment="PATH={{PROJECT_DIR}}/.venv/bin"
+# Use gunicorn (4 workers) in production. The background poller starts on import.
+ExecStart={{PROJECT_DIR}}/.venv/bin/gunicorn --workers 1 --threads 8 \
+    --bind 0.0.0.0:5000 --timeout 120 app.server:app
+Restart=on-failure
+RestartSec=5
+# Hardening (relax if it blocks firewall enforcement)
+NoNewPrivileges=false
+ProtectHome=false
+
+[Install]
+WantedBy=multi-user.target
